@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #F4EFE6;
+  --ink: #1B1A17;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: #1B1A17; color: #F4EFE6; }
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6E685D;
+}
+
+.h-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #1B1A17; color: #F4EFE6;
+  font-family: var(--font-sans);
+  font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0.95rem 1.6rem;
+  min-height: 44px;
+  transition: background 200ms ease, transform 150ms ease;
+}
+.btn-primary:hover { background: #2C2A26; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:focus-visible { outline: 2px solid #9A7E4F; outline-offset: 2px; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; color: #1B1A17;
+  border: 1px solid #1B1A17;
+  font-family: var(--font-sans);
+  font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0.95rem 1.6rem;
+  min-height: 44px;
+  transition: background 200ms ease, color 200ms ease;
+}
+.btn-ghost:hover { background: #1B1A17; color: #F4EFE6; }
+.btn-ghost:focus-visible { outline: 2px solid #9A7E4F; outline-offset: 2px; }
+
+.input-field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #D8CFB8;
+  padding: 0.85rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: #1B1A17;
+}
+.input-field:focus { outline: none; border-bottom-color: #1B1A17; }
+.input-field::placeholder { color: #A6A095; }
+
+.divider { height: 1px; background: #D8CFB8; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 38s linear infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fade-up 600ms ease both; }
+
+.product-card-img {
+  transition: transform 700ms ease;
+}
+.product-card:hover .product-card-img {
+  transform: scale(1.04);
+}

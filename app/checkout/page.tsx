@@ -69,7 +69,16 @@ export default function CheckoutPage() {
         }),
       });
       const order = await orderRes.json();
-      if (!orderRes.ok) throw new Error(order?.message || order?.error || 'Order failed');
+      if (!orderRes.ok) {
+        const msg =
+          order?.error === 'razorpay_not_configured'
+            ? 'Payments are not yet configured for this site. The shop owner needs to add Razorpay keys in Vercel.'
+            : order?.message || order?.error || 'Order failed';
+        throw new Error(msg);
+      }
+      if (typeof window.Razorpay !== 'function') {
+        throw new Error('Payment form is still loading. Please wait a moment and try again.');
+      }
 
       const items_for_capi = lines.map((l) => ({
         sku: l.variantId, productId: l.productId, variantId: l.variantId, qty: l.qty,

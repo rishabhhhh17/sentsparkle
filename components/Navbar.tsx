@@ -44,7 +44,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-2 md:gap-5">
-          <Link href="/products" className="hidden md:inline-flex btn-primary !py-2 !px-4 text-[0.68rem]">
+          <Link href="/products" className="hidden sm:inline-flex btn-primary !py-2 !px-4 !min-h-[36px] text-[0.68rem]">
             Shop now
           </Link>
           <button

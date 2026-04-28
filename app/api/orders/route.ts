@@ -51,6 +51,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'zero_amount' }, { status: 400 });
     }
 
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || /placeholder/i.test(process.env.RAZORPAY_KEY_ID)) {
+      return NextResponse.json(
+        { error: 'razorpay_not_configured', message: 'Add real Razorpay keys to Vercel env vars (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, NEXT_PUBLIC_RAZORPAY_KEY_ID).' },
+        { status: 503 },
+      );
+    }
+
     const event_id = crypto.randomUUID();
     const receipt = `ss_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -78,7 +85,8 @@ export async function POST(req: Request) {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     });
   } catch (e: any) {
-    console.error('[orders] error', e?.message);
-    return NextResponse.json({ error: 'order_failed', message: e?.message }, { status: 500 });
+    const msg = e?.error?.description || e?.message || String(e);
+    console.error('[orders] error', msg);
+    return NextResponse.json({ error: 'order_failed', message: msg }, { status: 500 });
   }
 }

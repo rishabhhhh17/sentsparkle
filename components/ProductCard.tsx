@@ -36,7 +36,7 @@ export default function ProductCard({ product }: { product: Product }) {
               image: product.images[1] ?? product.images[0],
             });
           }}
-          className="absolute right-3 bottom-3 bg-ivory text-ink h-11 w-11 grid place-items-center shadow-soft opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute right-3 bottom-3 bg-ivory text-ink h-11 w-11 grid place-items-center shadow-soft opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-ink hover:text-ivory"
         >
           <Plus size={18} />
         </button>

@@ -76,7 +76,7 @@ export default function Footer() {
           <p className="text-sm text-ivory">
             Use code{' '}
             <span className="font-mono font-semibold tracking-wider text-rose">WELCOME15</span>{' '}
-            for <span className="font-semibold">15% off</span> your first order.
+            for <span className="font-semibold">15% off</span> your order.
           </p>
         </div>
       </div>

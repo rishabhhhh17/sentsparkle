@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import MetaPixel from '@/components/MetaPixel';
+import AnnouncementBar from '@/components/AnnouncementBar';
 
 const display = Cormorant_Garamond({
   subsets: ['latin'],
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>
+        <AnnouncementBar />
         <Navbar />
         <main>{children}</main>
         <Footer />

@@ -34,13 +34,13 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.fbq === 'function' && lines.length > 0) {
       window.fbq('track', 'InitiateCheckout', {
-        value: subtotal / 100,
+        value: total / 100,
         currency: 'INR',
         num_items: itemsCount,
         content_ids: lines.map((l) => l.variantId),
       });
     }
-  }, [lines, subtotal, itemsCount]);
+  }, [lines, total, itemsCount]);
 
   const onChange = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));

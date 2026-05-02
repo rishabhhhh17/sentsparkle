@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { getRazorpay } from '@/lib/razorpay';
 import { getProductById, getVariant } from '@/lib/products';
+import {
+  clampDiscountForMinTotal,
+  computeSystemDiscountAmount,
+  findSystemDiscountCode,
+} from '@/lib/discounts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,6 +19,7 @@ export async function POST(req: Request) {
     const items: ItemIn[] = body?.items ?? [];
     const customer = body?.customer ?? {};
     const shipping = body?.shipping ?? {};
+    const discountCodeIn: string | undefined = body?.discountCode;
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'empty_cart' }, { status: 400 });
@@ -51,6 +57,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'zero_amount' }, { status: 400 });
     }
 
+    // Re-validate discount server-side — never trust client
+    let discount_paise = 0;
+    let appliedCode: string | null = null;
+    if (discountCodeIn) {
+      const found = findSystemDiscountCode(discountCodeIn);
+      if (found && amount_paise >= found.minOrderPaise) {
+        const raw = computeSystemDiscountAmount(found, amount_paise);
+        const clamped = clampDiscountForMinTotal(amount_paise, raw, 0);
+        discount_paise = clamped.discount;
+        appliedCode = found.code;
+      }
+    }
+    const total_paise = amount_paise - discount_paise;
+
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || /placeholder/i.test(process.env.RAZORPAY_KEY_ID)) {
       return NextResponse.json(
         { error: 'razorpay_not_configured', message: 'Add real Razorpay keys to Vercel env vars (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, NEXT_PUBLIC_RAZORPAY_KEY_ID).' },
@@ -63,7 +83,7 @@ export async function POST(req: Request) {
 
     const razorpay = getRazorpay();
     const order = await razorpay.orders.create({
-      amount: amount_paise,
+      amount: total_paise,
       currency: 'INR',
       receipt,
       notes: {
@@ -73,6 +93,9 @@ export async function POST(req: Request) {
         customer_phone: String(customer.phone).slice(0, 30),
         shipping: JSON.stringify(shipping).slice(0, 1500),
         items: JSON.stringify(priced_items).slice(0, 4500),
+        subtotal_paise: String(amount_paise),
+        discount_code: appliedCode ?? '',
+        discount_paise: String(discount_paise),
       },
     });
 

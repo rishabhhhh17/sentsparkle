@@ -16,7 +16,8 @@ declare global {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { lines, subtotalPaise, clear } = useCart();
+  const { lines, subtotalPaise, clear, discountCode, discountPaise, finalTotalPaise } =
+    useCart();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +27,8 @@ export default function CheckoutPage() {
   });
 
   const subtotal = subtotalPaise();
+  const discount = discountPaise();
+  const total = finalTotalPaise();
   const itemsCount = useMemo(() => lines.reduce((n, l) => n + l.qty, 0), [lines]);
 
   useEffect(() => {
@@ -62,6 +65,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: lines.map((l) => ({ productId: l.productId, variantId: l.variantId, qty: l.qty })),
           customer: { name: form.name, email: form.email, phone: form.phone },
+          discountCode: discountCode ?? undefined,
           shipping: {
             line1: form.line1, line2: form.line2, city: form.city,
             state: form.state, pincode: form.pincode, country: 'IN',
@@ -181,7 +185,7 @@ export default function CheckoutPage() {
             {error && <p className="text-ember text-sm">{error}</p>}
 
             <button type="submit" disabled={submitting || !allFilled} className="btn-primary w-full">
-              {submitting ? 'Opening Razorpay…' : `Pay ${formatINR(subtotal)}`}
+              {submitting ? 'Opening Razorpay…' : `Pay ${formatINR(total)}`}
             </button>
             <p className="text-xs text-smoke">
               You&apos;ll be redirected to Razorpay to pay securely. Your card data never touches our servers.
@@ -208,8 +212,11 @@ export default function CheckoutPage() {
             </ul>
             <div className="mt-5 pt-5 border-t border-line space-y-2">
               <Row label="Subtotal" value={formatINR(subtotal)} />
+              {discountCode && discount > 0 ? (
+                <Row label={`Discount (${discountCode})`} value={`−${formatINR(discount)}`} />
+              ) : null}
               <Row label="Shipping" value="Free" />
-              <Row label="Total" value={formatINR(subtotal)} bold />
+              <Row label="Total" value={formatINR(total)} bold />
             </div>
           </div>
         </aside>

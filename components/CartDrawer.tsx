@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X, Minus, Plus } from 'lucide-react';
@@ -7,7 +7,14 @@ import { useCart } from '@/lib/cart-store';
 import { formatINR } from '@/lib/products';
 
 export default function CartDrawer() {
-  const { isOpen, close, lines, setQty, remove, subtotalPaise } = useCart();
+  const {
+    isOpen, close, lines, setQty, remove,
+    subtotalPaise, discountCode, discountPaise, finalTotalPaise,
+    applyCode, removeCode,
+  } = useCart();
+  const subtotal = subtotalPaise();
+  const discount = discountPaise();
+  const total = finalTotalPaise();
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -97,8 +104,25 @@ export default function CartDrawer() {
             <div className="border-t border-line px-6 py-5 space-y-4 bg-parchment">
               <div className="flex items-center justify-between">
                 <span className="eyebrow">Subtotal</span>
-                <span className="font-display text-2xl">{formatINR(subtotalPaise())}</span>
+                <span className="text-sm">{formatINR(subtotal)}</span>
               </div>
+              {discountCode && discount > 0 ? (
+                <div className="flex items-center justify-between text-gold">
+                  <span className="eyebrow">
+                    Discount <span className="font-mono normal-case tracking-normal">({discountCode})</span>
+                  </span>
+                  <span className="text-sm">−{formatINR(discount)}</span>
+                </div>
+              ) : null}
+              <div className="flex items-center justify-between">
+                <span className="eyebrow text-ink">Total</span>
+                <span className="font-display text-2xl">{formatINR(total)}</span>
+              </div>
+              <CouponInput
+                discountCode={discountCode}
+                applyCode={applyCode}
+                removeCode={removeCode}
+              />
               <p className="text-xs text-smoke">
                 Free India shipping on every order. Taxes included.
               </p>
@@ -110,5 +134,77 @@ export default function CartDrawer() {
         )}
       </aside>
     </div>
+  );
+}
+
+function CouponInput({
+  discountCode,
+  applyCode,
+  removeCode,
+}: {
+  discountCode: string | null;
+  applyCode: (code: string) => { ok: true } | { ok: false; error: string };
+  removeCode: () => void;
+}) {
+  const [value, setValue] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  if (discountCode) {
+    return (
+      <div className="flex items-center justify-between border border-gold/40 bg-gold/10 px-3 py-2 text-xs">
+        <span>
+          Code applied:{' '}
+          <span className="font-mono font-semibold tracking-wider">{discountCode}</span>
+        </span>
+        <button
+          type="button"
+          onClick={removeCode}
+          aria-label="Remove discount code"
+          className="h-6 w-6 grid place-items-center hover:bg-cream"
+        >
+          <X size={12} />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setError(null);
+        const result = applyCode(value);
+        if (result.ok) setValue('');
+        else setError(result.error);
+      }}
+      className="space-y-1"
+    >
+      <div className="flex border border-line bg-ivory">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value.toUpperCase());
+            if (error) setError(null);
+          }}
+          placeholder="Discount code"
+          autoComplete="off"
+          spellCheck={false}
+          className="flex-1 bg-transparent px-3 py-2 text-sm uppercase tracking-wider focus:outline-none"
+        />
+        <button
+          type="submit"
+          disabled={!value.trim()}
+          className="px-4 text-xs uppercase tracking-widest text-ink hover:bg-cream disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Apply
+        </button>
+      </div>
+      {error ? (
+        <p role="alert" className="text-xs text-ember">
+          {error}
+        </p>
+      ) : null}
+    </form>
   );
 }

@@ -72,6 +72,16 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-stone/15">
+        <div className="mx-auto max-w-7xl px-5 md:px-10 py-5 text-center">
+          <p className="text-sm text-ivory">
+            Use code{' '}
+            <span className="font-mono font-semibold tracking-wider text-rose">WELCOME15</span>{' '}
+            for <span className="font-semibold">15% off</span> your first order.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-stone/15">
         <div className="mx-auto max-w-7xl px-5 md:px-10 py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <p className="text-stone text-xs">
             © {new Date().getFullYear()} SentSparkle Parfums Pvt. Ltd. — Bombay, India.
